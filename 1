@@ -1,0 +1,27 @@
+From 8843288d623919fd094a07a3be48de73dd91e821 Mon Sep 17 00:00:00 2001
+From: Abhisek Devkota <ciwrl@cyanogenmod.com>
+Date: Thu, 11 Aug 2016 10:06:27 -0700
+Subject: [PATCH] ghost: Shrink userdata for footer space
+
+Error:
+Cryptfs : Orig filesystem overlaps crypto footer region.
+  Cannot encrypt in place.
+
+Change-Id: I2a74049e08a3eccb2a7cdeee7411ae5a1de7f90f
+Signed-off-by: klozz <xxx.reptar.rawrr.xxx@gmail.com>
+---
+ BoardConfig.mk | 2 +-
+ xpe.mk         | 4 ++++
+ 2 files changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/BoardConfig.mk b/BoardConfig.mk
+index c856fc0..b551a17 100644
+--- a/BoardConfig.mk
++++ b/BoardConfig.mk
+@@ -42,4 +42,4 @@ BOARD_HAS_LARGE_FILESYSTEM := true
+ BOARD_BOOTIMAGE_PARTITION_SIZE := 0x00A00000
+ BOARD_RECOVERYIMAGE_PARTITION_SIZE := 0x00A00000
+ BOARD_SYSTEMIMAGE_PARTITION_SIZE := 1560281088
+-BOARD_USERDATAIMAGE_PARTITION_SIZE := 12884901888
++BOARD_USERDATAIMAGE_PARTITION_SIZE := 12884885504
+

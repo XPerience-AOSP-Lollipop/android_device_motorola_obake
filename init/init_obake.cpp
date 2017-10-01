@@ -27,7 +27,6 @@
    IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <unistd.h>
 #include <stdlib.h>
 
 #include <cutils/properties.h>
@@ -35,8 +34,6 @@
 #include "property_service.h"
 #include "log.h"
 #include "util.h"
-
-#define ISMATCH(a,b)	(!strncmp(a,b,PROP_VALUE_MAX))
 
 #define ARRAY_SIZE(x) (sizeof(x)/sizeof(x[0]))
 
@@ -58,8 +55,8 @@ static void set_cmdline_properties()
 
     for (i = 0; i < ARRAY_SIZE(prop_map); i++) {
         memset(prop, 0, PROP_VALUE_MAX);
-        rc = property_get(prop_map[i].src_prop, prop, NULL);
-        if (rc > 0) {
+        std::string temp_var=property_get(prop_map[i].src_prop);
+        if (temp_var=="") {
             property_set(prop_map[i].dest_prop, prop);
         } else {
             property_set(prop_map[i].dest_prop, prop_map[i].def_val);
@@ -100,36 +97,36 @@ static void verizon_properties()
 
 void vendor_load_properties()
 {
-    char platform[PROP_VALUE_MAX];
-    char radio[PROP_VALUE_MAX];
-    char device[PROP_VALUE_MAX];
-    char carrier[PROP_VALUE_MAX];
-    char bootdevice[PROP_VALUE_MAX];
-    char devicename[PROP_VALUE_MAX];
+    std::string platform;
+    std::string radio;
+    std::string device;
+    std::string carrier;
+    std::string bootdevice;
+    std::string devicename;
     int rc;
 
 
-    rc = property_get("ro.board.platform", platform, NULL);
-    if (!rc || !ISMATCH(platform, ANDROID_TARGET))
+    platform  = property_get("ro.board.platform");
+    if (platform != ANDROID_TARGET)
         return;
 
     set_cmdline_properties();
 
-    property_get("ro.boot.radio", radio, NULL);
-    property_get("ro.boot.carrier", carrier, NULL);
-    property_get("ro.boot.device", bootdevice, NULL);
-    if (ISMATCH(bootdevice, "obakem")) {
+    radio = property_get("ro.boot.radio");
+    carrier = property_get("ro.boot.carrier");
+    bootdevice = property_get("ro.boot.device");
+    if (bootdevice == "obakem") {
         /* xt1030 - obakem */
         property_set("ro.product.device", "obakem");
         property_set("ro.build.product", "obakem");
         property_set("ro.product.model", "DROID Mini");
         property_set("ro.audio.init", "obakem");
-    } else if (ISMATCH(bootdevice, "obake")) {
+    } else if (bootdevice == "obake") {
         /* xt1080 - obake */
         property_set("ro.product.device", "obake");
         property_set("ro.build.product", "obake");
         property_set("ro.product.model", "DROID Ultra");
-    } else if (ISMATCH(bootdevice, "obake-maxx")) {
+    } else if (bootdevice == "obake-maxx") {
         /* xt1080m - obake-maxx */
         property_set("ro.product.device", "obake-maxx");
         property_set("ro.build.product", "obake-maxx");
@@ -142,13 +139,13 @@ void vendor_load_properties()
     property_set("ro.build.fingerprint", "motorola/obake_verizon/obake:4.4.4/SU6-7.2/3:user/release-keys");
 
     /* fastboot oem config carrier switch */
-    if (ISMATCH(carrier, "vzw")) {
+    if (carrier == "vzw") {
         verizon_properties(); /* Default - set in FXZ */
     } else {
         gsm_properties(); /* Manually reconfigured */
     }
 
-    property_get("ro.product.device", device, NULL);
+    property_get("ro.product.device");
     strlcpy(devicename, device, sizeof(devicename));
-    INFO("Found device: %s radio id: %s carrier: %s Setting build properties for %s device\n", bootdevice, radio, carrier, devicename);
+    INFO("Found device: %s radio id: %s carrier: %s Setting build properties for %s device\n", bootdevice.c_str(), radio.c_str(), carrier.c_str(), devicename.c_str());
 }

@@ -27,8 +27,10 @@
    IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <unistd.h>
 #include <stdlib.h>
 
+#include <cutils/properties.h>
 #include "vendor_init.h"
 #include "property_service.h"
 #include "log.h"
@@ -56,7 +58,7 @@ static void set_cmdline_properties()
 
     for (i = 0; i < ARRAY_SIZE(prop_map); i++) {
         memset(prop, 0, PROP_VALUE_MAX);
-        rc = property_get(prop_map[i].src_prop, prop);
+        rc = property_get(prop_map[i].src_prop, prop, NULL);
         if (rc > 0) {
             property_set(prop_map[i].dest_prop, prop);
         } else {
@@ -107,15 +109,15 @@ void vendor_load_properties()
     int rc;
 
 
-    rc = property_get("ro.board.platform", platform);
+    rc = property_get("ro.board.platform", platform, NULL);
     if (!rc || !ISMATCH(platform, ANDROID_TARGET))
         return;
 
     set_cmdline_properties();
 
-    property_get("ro.boot.radio", radio);
-    property_get("ro.boot.carrier", carrier);
-    property_get("ro.boot.device", bootdevice);
+    property_get("ro.boot.radio", radio, NULL);
+    property_get("ro.boot.carrier", carrier, NULL);
+    property_get("ro.boot.device", bootdevice, NULL);
     if (ISMATCH(bootdevice, "obakem")) {
         /* xt1030 - obakem */
         property_set("ro.product.device", "obakem");
@@ -146,7 +148,7 @@ void vendor_load_properties()
         gsm_properties(); /* Manually reconfigured */
     }
 
-    property_get("ro.product.device", device);
+    property_get("ro.product.device", device, NULL);
     strlcpy(devicename, device, sizeof(devicename));
     INFO("Found device: %s radio id: %s carrier: %s Setting build properties for %s device\n", bootdevice, radio, carrier, devicename);
 }

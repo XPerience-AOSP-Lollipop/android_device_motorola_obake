@@ -146,6 +146,5 @@ void vendor_load_properties()
     }
 
     property_get("ro.product.device");
-    strlcpy(devicename, device, sizeof(devicename));
     INFO("Found device: %s radio id: %s carrier: %s Setting build properties for %s device\n", bootdevice.c_str(), radio.c_str(), carrier.c_str(), devicename.c_str());
 }
